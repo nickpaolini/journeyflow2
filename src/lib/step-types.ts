@@ -34,6 +34,36 @@ export const STEP_TYPES = {
     label: 'Webhook',
     icon: '🔗',
     color: '#ef4444'
+  },
+  FEEDBACK: {
+    id: 'feedback',
+    label: 'Feedback',
+    icon: '💬',
+    color: '#FFD700'
+  },
+  DISCOVERY: {
+    id: 'discovery',
+    label: 'Discovery',
+    icon: '🔍',
+    color: '#00BFFF'
+  },
+  SUPPORT: {
+    id: 'support',
+    label: 'Support',
+    icon: '🆘',
+    color: '#06b6d4'
+  },
+  MILESTONE: {
+    id: 'milestone',
+    label: 'Milestone',
+    icon: '🏁',
+    color: '#84cc16'
+  },
+  INTERNAL: {
+    id: 'internal',
+    label: 'Internal Process',
+    icon: '⚙️',
+    color: '#64748b'
   }
 } as const
 

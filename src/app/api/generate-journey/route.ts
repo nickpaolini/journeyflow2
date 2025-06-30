@@ -33,7 +33,7 @@ Return ONLY a valid JSON object (no markdown, no commentary, no additional text 
       "tempId": "s2", 
       "title": "Step Title 2", 
       "description": "Description for step 2.",
-      "stepType": "input",
+      "stepType": "email",
       "stepColor": "#3b82f6"
     }
   ],
@@ -47,37 +47,44 @@ Return ONLY a valid JSON object (no markdown, no commentary, no additional text 
 
 Step Type Guidelines - Choose the most appropriate type based on the INTENT and NATURE of the step:
 
-- "action": Customer performs an action or task (e.g., clicking buttons, filling forms, making purchases, navigating pages)
-- "input": Customer provides information or data (e.g., entering personal details, uploading files, selecting preferences)
-- "output": System provides result or response (e.g., confirmation emails, receipts, status updates, error messages)
-- "decision": Customer makes a choice that impacts journey path (e.g., selecting plan options, choosing payment method, deciding to continue or abandon)
-- "feedback": Customer expresses feelings, ratings, or reviews (e.g., leaving reviews, rating experiences, providing testimonials, complaining)
-- "information": Customer consumes or seeks information (e.g., reading product details, viewing help articles, watching tutorials, browsing catalogs)
-- "support": Customer service or self-service interactions (e.g., contacting helpdesk, using live chat, accessing FAQ, getting assistance)
-- "milestone": Significant achievements or desired outcomes (e.g., completing onboarding, reaching goals, account activation, successful purchase)
-- "internal": Backend operations that influence customer experience (e.g., order processing, account verification, payment processing, inventory checks)
+- "action": Customer performs an action or task (e.g., clicking buttons, filling forms, making purchases, navigating pages) [⚡ #10b981]
+- "decision": Customer makes a choice that impacts journey path (e.g., selecting plan options, choosing payment method, deciding to continue or abandon) [❓ #f59e0b]
+- "wait": Waiting period or delay in the process (e.g., waiting for approval, processing time) [⏱️ #6b7280]
+- "email": Email communication sent or received (e.g., confirmation, notification) [📧 #3b82f6]
+- "sms": SMS/text message sent or received (e.g., verification code, alert) [📱 #8b5cf6]
+- "webhook": Automated system-to-system notification or integration (e.g., webhook trigger, API call) [🔗 #ef4444]
+- "feedback": Customer expresses feelings, ratings, or reviews (e.g., leaving reviews, rating experiences, providing testimonials, complaining) [💬 #FFD700]
+- "discovery": Customer discovers or learns about something new (e.g., product discovery, feature exploration) [🔍 #00BFFF]
+- "support": Customer service or self-service interactions (e.g., contacting helpdesk, using live chat, accessing FAQ, getting assistance) [🆘 #06b6d4]
+- "milestone": Significant achievements or desired outcomes (e.g., completing onboarding, reaching goals, account activation, successful purchase) [🏁 #84cc16]
+- "internal": Backend or internal process that influences customer experience (e.g., order processing, account verification, payment processing, inventory checks) [⚙️ #64748b]
 
 Color Mapping (use exact HEX codes):
 - action: #10b981 (emerald green)
-- input: #3b82f6 (blue)
-- output: #f59e0b (amber)
-- decision: #ef4444 (red)
-- feedback: #8b5cf6 (purple)
-- information: #6b7280 (gray)
+- decision: #f59e0b (amber)
+- wait: #6b7280 (gray)
+- email: #3b82f6 (blue)
+- sms: #8b5cf6 (purple)
+- webhook: #ef4444 (red)
+- feedback: #FFD700 (gold)
+- discovery: #00BFFF (deep sky blue)
 - support: #06b6d4 (cyan)
 - milestone: #84cc16 (lime green)
 - internal: #64748b (slate)
 
 Categorization Examples:
-- "Customer reads product description" → information (#6b7280)
-- "Customer fills out registration form" → input (#3b82f6)
+- "Customer reads product description" → discovery (#00BFFF)
+- "Customer fills out registration form" → action (#10b981)
 - "Customer clicks 'Buy Now' button" → action (#10b981)
-- "System sends confirmation email" → output (#f59e0b)
-- "Customer chooses premium plan" → decision (#ef4444)
-- "Customer leaves 5-star review" → feedback (#8b5cf6)
+- "System sends confirmation email" → email (#3b82f6)
+- "System sends SMS verification" → sms (#8b5cf6)
+- "System triggers webhook" → webhook (#ef4444)
+- "Customer chooses premium plan" → decision (#f59e0b)
+- "Customer leaves 5-star review" → feedback (#FFD700)
 - "Customer contacts support" → support (#06b6d4)
 - "Customer completes onboarding" → milestone (#84cc16)
 - "System processes payment" → internal (#64748b)
+- "Customer waits for approval" → wait (#6b7280)
 
 Guidelines:
 - Each step title should be 2-4 words maximum
