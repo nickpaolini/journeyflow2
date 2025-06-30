@@ -1,5 +1,6 @@
 "use client"
 
+import { Suspense } from 'react'
 import { useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
@@ -10,7 +11,7 @@ import { toast } from 'sonner'
 import { ArrowLeft, Lock, Eye, EyeOff, ArrowRight, CheckCircle, Map } from 'lucide-react'
 import Link from 'next/link'
 
-export default function UpdatePasswordPage() {
+function UpdatePasswordPageInner() {
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
@@ -206,27 +207,21 @@ export default function UpdatePasswordPage() {
                 </div>
               </div>
 
-              <Button
-                type="submit"
-                className="w-full"
-                disabled={loading}
-              >
-                {loading ? (
-                  <>
-                    <div className="h-4 w-4 mr-2 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                    Updating Password...
-                  </>
-                ) : (
-                  <>
-                    Update Password
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </>
-                )}
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? 'Updating...' : 'Update Password'}
               </Button>
             </form>
           </CardContent>
         </Card>
       </div>
     </div>
+  )
+}
+
+export default function UpdatePasswordPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <UpdatePasswordPageInner />
+    </Suspense>
   )
 } 
