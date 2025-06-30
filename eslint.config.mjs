@@ -14,7 +14,6 @@ const eslintConfig = [
   {
     rules: {
       "no-unused-vars": "warn",
-      "no-explicit-any": "warn",
       "react/no-unescaped-entities": "warn",
       "react-hooks/exhaustive-deps": "warn",
     },
