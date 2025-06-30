@@ -23,6 +23,7 @@ import {
 } from 'lucide-react'
 import { v4 as uuidv4 } from 'uuid'
 import ProtectedRoute from '@/components/auth/ProtectedRoute'
+import { STEP_TYPES, getStepTypeById, getStepTypeByLabel } from '@/lib/step-types'
 
 // Import the existing journey mapping functionality
 // This will be the same as the current page.tsx but wrapped in authentication
@@ -723,19 +724,6 @@ export default function DashboardPage() {
       setIsGenerating(false)
     }
   }, [aiPrompt, generateId])
-
-  // Step types and colors
-  const STEP_TYPES = {
-    ACTION: { id: 'action', label: 'Action', color: '#10b981', icon: '⚡' },
-    INPUT: { id: 'input', label: 'Input', color: '#3b82f6', icon: '📝' },
-    OUTPUT: { id: 'output', label: 'Output', color: '#f59e0b', icon: '📤' },
-    DECISION: { id: 'decision', label: 'Decision', color: '#ef4444', icon: '❓' },
-    FEEDBACK: { id: 'feedback', label: 'Feedback', color: '#8b5cf6', icon: '💬' },
-    INFORMATION: { id: 'information', label: 'Information', color: '#6b7280', icon: '📖' },
-    SUPPORT: { id: 'support', label: 'Support', color: '#06b6d4', icon: '🆘' },
-    MILESTONE: { id: 'milestone', label: 'Milestone', color: '#84cc16', icon: '🎯' },
-    INTERNAL: { id: 'internal', label: 'Internal', color: '#64748b', icon: '⚙️' }
-  }
 
   // Start resizing
   const startResize = useCallback((e: React.MouseEvent, stepId: string, handle: 'se' | 'sw' | 'ne' | 'nw') => {
@@ -1574,51 +1562,4 @@ interface Connection {
   id: string
   fromId: string
   toId: string
-}
-
-export const STEP_TYPES = {
-  ACTION: {
-    id: 'action',
-    label: 'Action',
-    icon: '⚡',
-    color: '#10b981'
-  },
-  DECISION: {
-    id: 'decision',
-    label: 'Decision',
-    icon: '❓',
-    color: '#f59e0b'
-  },
-  WAIT: {
-    id: 'wait',
-    label: 'Wait',
-    icon: '⏱️',
-    color: '#6b7280'
-  },
-  EMAIL: {
-    id: 'email',
-    label: 'Email',
-    icon: '📧',
-    color: '#3b82f6'
-  },
-  SMS: {
-    id: 'sms',
-    label: 'SMS',
-    icon: '📱',
-    color: '#8b5cf6'
-  },
-  WEBHOOK: {
-    id: 'webhook',
-    label: 'Webhook',
-    icon: '🔗',
-    color: '#ef4444'
-  }
-} as const
-
-export const getStepTypeById = (id: string) => {
-  return Object.values(STEP_TYPES).find(type => type.id === id)
-}
-
-export const getStepTypeByLabel = (label: string) => {
-  return Object.values(STEP_TYPES).find(type => type.label === label)
 } 
