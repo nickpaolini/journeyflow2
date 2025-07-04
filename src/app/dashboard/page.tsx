@@ -24,15 +24,13 @@ import {
 import { v4 as uuidv4 } from 'uuid'
 import ProtectedRoute from '@/components/auth/ProtectedRoute'
 import { STEP_TYPES, getStepTypeById, getStepTypeByLabel } from '@/lib/step-types'
-import { useSearchParams } from 'next/navigation'
 
 // Import the existing journey mapping functionality
 // This will be the same as the current page.tsx but wrapped in authentication
 
 export default function DashboardPage() {
   const { user, signOut } = useAuth()
-  const { currentProject, projects, createProject, loadProject, loadProjectData, saveProject, deleteProject } = useProject()
-  const searchParams = useSearchParams();
+  const { currentProject, projects, createProject, loadProject, loadProjectData, saveProject } = useProject()
   
   // All the existing state and functionality from the main page
   const [steps, setSteps] = useState<JourneyStep[]>([])
@@ -71,10 +69,6 @@ export default function DashboardPage() {
   const [aiPrompt, setAIPrompt] = useState("")
   const [isGenerating, setIsGenerating] = useState(false)
   const [aiError, setAIError] = useState("")
-  const [aiMode, setAIMode] = useState<'basic' | 'advanced'>('basic')
-  const [persona, setPersona] = useState("")
-  const [scenario, setScenario] = useState("")
-  const [goals, setGoals] = useState("")
 
   // New state for legend visibility
   const [showLegend, setShowLegend] = useState(false)
@@ -113,10 +107,6 @@ export default function DashboardPage() {
   const inlineEditInputRef = useRef<HTMLInputElement>(null)
   const inlineEditTextareaRef = useRef<HTMLTextAreaElement>(null)
 
-  // Add state for project deletion in the selector dialog
-  const [selectorProjectToDelete, setSelectorProjectToDelete] = useState<string | null>(null)
-  const [showSelectorDeleteDialog, setShowSelectorDeleteDialog] = useState(false)
-
   // Check if we're on the client side
   useEffect(() => {
     setIsClient(true)
@@ -137,14 +127,6 @@ export default function DashboardPage() {
 
     loadCurrentProjectData()
   }, [currentProject, loadProjectData])
-
-  // Handle URL parameter for project loading
-  useEffect(() => {
-    const projectId = searchParams.get('project');
-    if (projectId && (!currentProject || currentProject.id !== projectId)) {
-      loadProject(projectId);
-    }
-  }, [searchParams, currentProject, loadProject]);
 
   // Generate unique ID
   const generateId = () => uuidv4()
@@ -630,18 +612,12 @@ export default function DashboardPage() {
     setAIError("")
 
     try {
-      const body: any = { prompt: aiPrompt, mode: aiMode }
-      if (aiMode === 'advanced') {
-        body.persona = persona
-        body.scenario = scenario
-        body.goals = goals
-      }
       const response = await fetch('/api/generate-journey', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(body),
+        body: JSON.stringify({ prompt: aiPrompt }),
       })
 
       if (!response.ok) {
@@ -694,14 +670,7 @@ export default function DashboardPage() {
           highlighted: false,
           stepType: aiStep.stepType || 'action',
           stepColor: aiStep.stepColor || '#10b981',
-          customColorOverride: false,
-          // Pass through advanced fields if present
-          ...(aiMode === 'advanced' ? {
-            details: aiStep.details,
-            complexity: aiStep.complexity,
-            priority: aiStep.priority,
-            tags: aiStep.tags
-          } : {})
+          customColorOverride: false
         })
       })
 
@@ -746,10 +715,6 @@ export default function DashboardPage() {
       // Close modal and reset
       setShowAIModal(false)
       setAIPrompt("")
-      setPersona("")
-      setScenario("")
-      setGoals("")
-      setAIMode('basic')
       toast.success('AI journey generated successfully!')
       
     } catch (error) {
@@ -758,7 +723,7 @@ export default function DashboardPage() {
     } finally {
       setIsGenerating(false)
     }
-  }, [aiPrompt, aiMode, persona, scenario, goals, generateId, canvasTransform])
+  }, [aiPrompt, generateId])
 
   // Start resizing
   const startResize = useCallback((e: React.MouseEvent, stepId: string, handle: 'se' | 'sw' | 'ne' | 'nw') => {
@@ -966,24 +931,6 @@ export default function DashboardPage() {
     setCanvasTransform({ x: 0, y: 0, scale: 1 })
     toast.success('View reset to center')
   }, [])
-
-  // Handler for delete in selector dialog
-  const handleSelectorDelete = (projectId: string) => {
-    setSelectorProjectToDelete(projectId)
-    setShowSelectorDeleteDialog(true)
-  }
-
-  const confirmSelectorDelete = async () => {
-    if (!selectorProjectToDelete) return
-    const result = await deleteProject(selectorProjectToDelete)
-    if (result.error) {
-      toast.error(`Failed to delete project: ${result.error.message}`)
-    } else {
-      toast.success('Project deleted successfully')
-      setSelectorProjectToDelete(null)
-      setShowSelectorDeleteDialog(false)
-    }
-  }
 
   return (
     <ProtectedRoute>
@@ -1486,7 +1433,7 @@ export default function DashboardPage() {
           </DialogContent>
         </Dialog>
 
-        {/* Project selector dialog (updated) */}
+        {/* Project selector dialog */}
         <Dialog open={showProjectSelector} onOpenChange={setShowProjectSelector}>
           <DialogContent>
             <DialogHeader>
@@ -1494,28 +1441,10 @@ export default function DashboardPage() {
             </DialogHeader>
             <div className="space-y-2 max-h-60 overflow-y-auto">
               {projects.map((project: any) => (
-                <div key={project.id} className="flex items-center justify-between border rounded-lg p-2">
-                  <div className="flex items-center gap-2">
-                    <Map className="h-4 w-4 text-muted-foreground" />
-                    <span className="truncate font-medium">{project.title}</span>
-                  </div>
-                  <div className="flex gap-2">
-                    <Button
-                      size="sm"
-                      variant={currentProject?.id === project.id ? 'default' : 'outline'}
-                      onClick={() => handleSelectProject(project.id)}
-                    >
-                      Open
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="destructive"
-                      onClick={() => handleSelectorDelete(project.id)}
-                    >
-                      <Trash2 className="h-4 w-4 mr-1" /> Delete
-                    </Button>
-                  </div>
-                </div>
+                <Button key={project.id} variant={currentProject?.id === project.id ? 'default' : 'outline'} className="w-full justify-start" onClick={() => handleSelectProject(project.id)}>
+                  <Map className="h-4 w-4 mr-2" />
+                  {project.title}
+                </Button>
               ))}
             </div>
             <div className="pt-4 border-t mt-4">
@@ -1525,28 +1454,6 @@ export default function DashboardPage() {
               <Button onClick={handleCreateProject} className="w-full">Create Project</Button>
             </div>
           </DialogContent>
-          {/* Delete confirmation dialog for selector */}
-          <Dialog open={showSelectorDeleteDialog} onOpenChange={setShowSelectorDeleteDialog}>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Delete Project</DialogTitle>
-                <DialogDescription>
-                  Are you sure you want to delete this project? This action cannot be undone and will permanently remove all steps and connections.
-                </DialogDescription>
-              </DialogHeader>
-              <DialogFooter>
-                <Button variant="outline" onClick={() => setShowSelectorDeleteDialog(false)}>
-                  Cancel
-                </Button>
-                <Button 
-                  variant="destructive" 
-                  onClick={confirmSelectorDelete}
-                >
-                  Delete Project
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
         </Dialog>
 
         {/* AI Generation Modal */}
@@ -1558,67 +1465,11 @@ export default function DashboardPage() {
                 Generate Journey with AI
               </DialogTitle>
               <DialogDescription>
-                Choose your generation mode and describe your customer journey. Advanced mode provides richer step details.
+                Describe your customer journey and AI will generate a complete journey map with steps and connections.
               </DialogDescription>
             </DialogHeader>
+            
             <div className="space-y-4">
-              {/* Mode Toggle */}
-              <div className="flex gap-2">
-                <Button
-                  variant={aiMode === 'basic' ? 'gradient' : 'outline'}
-                  onClick={() => setAIMode('basic')}
-                  disabled={isGenerating}
-                  className="flex-1"
-                >
-                  Basic
-                </Button>
-                <Button
-                  variant={aiMode === 'advanced' ? 'gradient' : 'outline'}
-                  onClick={() => setAIMode('advanced')}
-                  disabled={isGenerating}
-                  className="flex-1"
-                >
-                  Advanced
-                </Button>
-              </div>
-              {/* Advanced fields */}
-              {aiMode === 'advanced' && (
-                <div className="grid grid-cols-1 gap-3">
-                  <div>
-                    <label className="text-sm font-medium">Persona</label>
-                    <input
-                      type="text"
-                      value={persona}
-                      onChange={e => setPersona(e.target.value)}
-                      placeholder="Describe the target customer persona"
-                      className="w-full p-2 border rounded-md bg-background text-foreground"
-                      disabled={isGenerating}
-                    />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium">Scenario</label>
-                    <input
-                      type="text"
-                      value={scenario}
-                      onChange={e => setScenario(e.target.value)}
-                      placeholder="Describe the scenario or use case"
-                      className="w-full p-2 border rounded-md bg-background text-foreground"
-                      disabled={isGenerating}
-                    />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium">Goals</label>
-                    <input
-                      type="text"
-                      value={goals}
-                      onChange={e => setGoals(e.target.value)}
-                      placeholder="List the business or customer goals"
-                      className="w-full p-2 border rounded-md bg-background text-foreground"
-                      disabled={isGenerating}
-                    />
-                  </div>
-                </div>
-              )}
               <div>
                 <label className="text-sm font-medium">Journey Description</label>
                 <textarea
@@ -1629,15 +1480,18 @@ export default function DashboardPage() {
                   disabled={isGenerating}
                 />
               </div>
+              
               {aiError && (
                 <div className="p-3 bg-destructive/10 border border-destructive/20 rounded-md text-destructive text-sm">
                   {aiError}
                 </div>
               )}
+              
               <div className="text-xs text-muted-foreground">
                 💡 Tip: Be specific about the customer's goals, pain points, and the steps they take. The more detail you provide, the better the AI-generated journey will be.
               </div>
             </div>
+            
             <DialogFooter>
               <Button 
                 variant="outline" 
