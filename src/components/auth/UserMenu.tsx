@@ -3,11 +3,14 @@
 import { useState } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import { Button } from '@/components/ui/button'
-import { LogOut, User } from 'lucide-react'
+import { LogOut, User, Map } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { DropdownMenu, DropdownMenuItem } from '@/components/ui/dropdown-menu'
 
 export default function UserMenu() {
   const { user, signOut } = useAuth()
   const [isSigningOut, setIsSigningOut] = useState(false)
+  const router = useRouter()
 
   const handleSignOut = async () => {
     setIsSigningOut(true)
@@ -47,6 +50,10 @@ export default function UserMenu() {
           </>
         )}
       </Button>
+      <DropdownMenuItem onClick={() => router.push('/projects')}>
+        <Map className="h-4 w-4 mr-2" />
+        My Projects
+      </DropdownMenuItem>
     </div>
   )
 } 
